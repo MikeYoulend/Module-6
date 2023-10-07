@@ -15,10 +15,10 @@ body {
 	padding: 20px;
 	border-radius: 10px;
 	box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
-	width: 80%; /* Larghezza massima della card */
 	max-width: 600px; /* Larghezza massima per schermi più larghi */
+	height: 840px;
 	margin: 30px auto; /* Centra la card orizzontalmente e applica margini sopra e sotto */
-	text-align: center; /* Allinea il testo a sinistra all'interno della card */
+	text-align: center;
 }
 
 .blog-post-title {
@@ -52,6 +52,27 @@ body {
 
 /* Aggiungi effetto hover per un po' di interattività */
 .blog-post-container:hover {
-	box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.534);
+	box-shadow: 0px 0px 20px 0px rgb(0, 236, 225);
 	transition: box-shadow 0.3s ease;
+}
+
+.navbar {
+	background-color: #f5f5f5; /* Colore di sfondo della barra di ricerca */
+	padding: 15px; /* Spazio interno all'interno della barra di ricerca */
+	border-radius: 25px; /* Bordo arrotondato */
+	box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1); /* Ombra leggera */
+	display: flex;
+	align-items: center;
+	justify-content: center; /* Centra il contenuto orizzontalmente */
+}
+
+/* Stile del campo di input */
+input[type="text"] {
+	border: none; /* Rimuovi il bordo del campo di input */
+	outline: none; /* Rimuovi l'outline al focus */
+	font-size: 20px; /* Dimensione del testo */
+	font-weight: bold;
+	width: 80%; /* Occupa l'80% dello spazio disponibile */
+	padding: 10px; /* Spazio interno nel campo di input */
+	border-radius: 20px; /* Bordo arrotondato */
 }
