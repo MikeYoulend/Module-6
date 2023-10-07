@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Spinner } from "react-bootstrap";
+import { Col, Row, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts, setFilteredPosts } from "../../../reducers";
 import "../../../App.css";
@@ -35,7 +35,12 @@ const BlogPost = () => {
 	const handleSearch = (e) => {
 		const query = e.target.value.toLowerCase();
 		const filteredPosts = allPosts.filter((post) => {
-			return post.title.toLowerCase().includes(query);
+			const titleMatch = post.title.toLowerCase().includes(query);
+			const authorMatch = post.author.name.toLowerCase().includes(query);
+			const categoryMatch = post.category.toLowerCase().includes(query);
+
+			// Restituisci true se il titolo, l'autore o la categoria corrispondono alla query
+			return titleMatch || authorMatch || categoryMatch;
 		});
 
 		// I dati filtrati vengono inviati a Redux usando l'azione setFilteredPosts
@@ -43,38 +48,46 @@ const BlogPost = () => {
 		// Aggiorna lo stato locale per visualizzare i risultati filtrati
 		setPostsState(filteredPosts);
 	};
-
 	if (loading) {
 		// Se i dati stanno ancora caricando, mostra un messaggio di caricamento
 		return (
-			<div className="text-center bg-info fs-1">
-				<Spinner animation="border" variant="light" />
+			<div className="text-center bg-info fs-1 fw-bold">
+				<Spinner className="me-2" animation="border" variant="light" />
 				Caricamento in corso...
 			</div>
 		);
 	}
 
 	return (
-		<div>
-			<div className="navbar">
-				<input type="text" placeholder="Cerca..." onChange={handleSearch} />
+		<div className="container-fluid bg-dark">
+			<div className="navbar-home bg-danger">
+				<input
+					className="input-search"
+					type="text"
+					placeholder="Cerca per titolo, autore o categoria..."
+					onChange={handleSearch}
+				/>
 			</div>
-			{posts.map((post) => (
-				<div key={post._id} className="blog-post-container">
-					<h2 className="blog-post-title">{post.title}</h2>
-					<p className="blog-post-category">Categoria: {post.category}</p>
-					<p className="blog-post-author">Autore: {post.author.name}</p>
-					<p className="blog-post-readtime">
-						Tempo di Lettura: {post.readtime.value} {post.readtime.unit}
-					</p>
-					<img
-						className="blog-post-image"
-						src={post.cover}
-						alt="Copertina del Blog Post"
-					/>
-					<p className="blog-post-content">{post.content}</p>
-				</div>
-			))}
+			<Row xs={1} md={3} className="g-4">
+				{posts.map((post) => (
+					<Col key={post._id}>
+						<div className="blog-post-container">
+							<h2 className="blog-post-title">{post.title}</h2>
+							<p className="blog-post-category">Categoria: {post.category}</p>
+							<p className="blog-post-author">Autore: {post.author.name}</p>
+							<p className="blog-post-readtime">
+								Tempo di Lettura: {post.readtime.value} {post.readtime.unit}
+							</p>
+							<img
+								className="blog-post-image"
+								src={post.cover}
+								alt="Copertina del Blog Post"
+							/>
+							<p className="blog-post-content">{post.content}</p>
+						</div>
+					</Col>
+				))}
+			</Row>
 		</div>
 	);
 };

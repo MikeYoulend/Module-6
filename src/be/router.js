@@ -114,13 +114,50 @@ router.delete("/authors/:id", async (req, res) => {
 	}
 });
 
+//
 //BLOGPOST
+//
+
+router.get("/blogposts/:id/:authorName", async (req, res) => {
+	const authorId = req.params.id;
+	const authorName = req.params.authorName.replace("_", " "); // Sostituisci "_" con uno spazio nel nome dell'autore
+
+	try {
+		const blogPostsByAuthor = await BlogPost.find({
+			"author.id": authorId,
+			"author.name": authorName,
+		});
+
+		// Se l'autore non ha pubblicato alcun blog post, restituisci una risposta vuota
+		if (!blogPostsByAuthor || blogPostsByAuthor.length === 0) {
+			return res
+				.status(404)
+				.json({ message: "Nessun blog post trovato per questo autore." });
+		}
+
+		// Restituisci i blog post dell'autore specificato come risposta
+		res.json(blogPostsByAuthor);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+});
 
 // GET: Restituisci tutti i blog post
 router.get("/blogposts", async (req, res) => {
 	try {
-		const blogPosts = await BlogPost.find();
-		res.json(blogPosts);
+		const { title } = req.query; // Ottieni il titolo dalla query
+
+		// Se è specificato un titolo, filtra i post per quel titolo
+		if (title) {
+			const filteredPosts = await BlogPost.find({
+				title: { $regex: title, $options: "i" },
+			});
+			return res.json(filteredPosts);
+		}
+
+		// Se non è specificato un titolo, restituisci tutti i post
+		const allPosts = await BlogPost.find();
+		res.json(allPosts);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}

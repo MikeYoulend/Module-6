@@ -6,3 +6,15 @@ GET http://localhost:5050/authors/1
 
 ### Richiest GET per ottenere i BlogPost
 GET http://localhost:5050/blogposts
+
+### Richiesta Get per Singolo Blogpost ID
+
+GET http://localhost:5050/blogposts/65201821655e04b71200a01e
+
+### Richiesta Get per titolo
+
+GET http://localhost:5050/blogposts?title=Artificiale
+
+### Richiest Get per id specifico del post del nome autore
+
+GET http://localhost:5050/blogposts/65201821655e04b71200a01/John_Doe
