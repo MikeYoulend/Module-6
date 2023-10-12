@@ -123,7 +123,7 @@ const BlogPostForm = () => {
 				<Form.Group className="mb-3" controlId="cover">
 					<Form.Label>Link dell'Immagine di Copertina:</Form.Label>
 					<Form.Control
-						type="url"
+						type="file"
 						name="cover"
 						value={formData.cover}
 						onChange={handleInputChange}
