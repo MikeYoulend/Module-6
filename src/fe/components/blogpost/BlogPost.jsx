@@ -1,14 +1,42 @@
 import React, { useState, useEffect } from "react";
 import { Col, Row, Spinner } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import { setPosts, setFilteredPosts } from "../../../reducers";
+import { useSelector } from "react-redux";
 import "../../../App.css";
+import AddCommentForm from "../CommentArea/AddCommentForm";
 
 const BlogPost = () => {
-	const dispatch = useDispatch();
 	const allPosts = useSelector((state) => state.posts);
 	const [loading, setLoading] = useState(true);
 	const [posts, setPostsState] = useState(allPosts);
+
+	const handleCommentSubmit = (postId, text) => {
+		console.log("ID del post:", postId);
+		console.log("Testo del commento:", text);
+		// Effettua una richiesta POST al backend per inviare il commento
+		fetch(`http://localhost:5050/blogposts/${postId}/comments`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ text }),
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log("Risposta dal server:", data);
+				console.log("ID del post:", postId);
+				// Verifica se il post è valido prima di aggiungere il commento
+				const updatedPosts = posts.map((post) => {
+					if (post._id === postId && post.comments) {
+						post.comments.push(data.comment);
+					}
+					return post;
+				});
+				setPostsState(updatedPosts);
+			})
+			.catch((error) => {
+				console.error("Errore durante l'invio del commento:", error);
+			});
+	};
 
 	useEffect(() => {
 		// Effettua una richiesta GET all'endpoint del tuo server backend
@@ -16,7 +44,7 @@ const BlogPost = () => {
 			.then((response) => response.json())
 			.then((data) => {
 				// I dati ottenuti dalla richiesta vengono inviati a Redux usando l'azione setPosts
-				dispatch(setPosts(data));
+
 				// Imposta i post locali con i dati ottenuti
 				setPostsState(data);
 
@@ -30,7 +58,7 @@ const BlogPost = () => {
 				// Imposta loading a false in caso di errore nel caricamento dei dati
 				setLoading(false);
 			});
-	}, [dispatch]); // Assicurati di passare dispatch come dipendenza per evitare warning sull'uso di dispatch nel useEffect
+	}, []); // Assicurati di passare dispatch come dipendenza per evitare warning sull'uso di dispatch nel useEffect
 
 	const handleSearch = (e) => {
 		const query = e.target.value.toLowerCase();
@@ -44,7 +72,7 @@ const BlogPost = () => {
 		});
 
 		// I dati filtrati vengono inviati a Redux usando l'azione setFilteredPosts
-		dispatch(setFilteredPosts(filteredPosts));
+
 		// Aggiorna lo stato locale per visualizzare i risultati filtrati
 		setPostsState(filteredPosts);
 	};
@@ -84,6 +112,10 @@ const BlogPost = () => {
 								alt="Copertina del Blog Post"
 							/>
 							<p className="blog-post-content">{post.content}</p>
+							<AddCommentForm
+								postId={post._id}
+								onCommentSubmit={handleCommentSubmit}
+							/>
 						</div>
 					</Col>
 				))}

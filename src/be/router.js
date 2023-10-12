@@ -2,6 +2,34 @@ const express = require("express");
 const router = express.Router();
 const Author = require("./models/authors");
 const BlogPost = require("./models/blogPost");
+const multer = require("multer");
+const crypto = require("crypto");
+const path = require("path");
+
+const internalStorage = multer.diskStorage({
+	destination: (req, file, cb) => {
+		cb(null, "src/be/public");
+	},
+	filename: (req, file, cb) => {
+		const uniqueSuffix = `${Date.now()}-${crypto.randomUUID()}`;
+		const fileExtension = path.extname(file.originalname);
+		cb(null, `${file.fieldname}-${uniqueSuffix}${fileExtension}`);
+	},
+});
+
+const upload = multer({ storage: internalStorage });
+
+router.post("/posts/upload", upload.single("cover"), async (req, res) => {
+	const url = `${req.protocol}://${req.get("host")}`;
+
+	try {
+		const imgUrl = req.file.filename;
+		res.status(200).json({ img: `${url}/public/${imgUrl}` });
+	} catch (error) {
+		console.error("Errore durante l'upload del file:", error);
+		res.status(500).json({ error: "Errore durante l'upload del file" });
+	}
+});
 
 router.get("/authors/:id", async (req, res) => {
 	try {
@@ -132,7 +160,7 @@ router.get("/blogposts/:id/:authorName", async (req, res) => {
 		if (!blogPostsByAuthor || blogPostsByAuthor.length === 0) {
 			return res
 				.status(404)
-				.json({ message: "Nessun blog post trovato per questo autore." });
+				.json({ message: "Nessun commento trovato per questo post." });
 		}
 
 		// Restituisci i blog post dell'autore specificato come risposta
@@ -221,6 +249,111 @@ router.delete("/blogposts/:id", async (req, res) => {
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
+});
+
+//
+//Comments
+//
+
+router.get("/blogposts/:id/comments", async (req, res) => {
+	try {
+		const postId = req.params.id;
+
+		// Cerca i commenti in base all'ID del post
+		const comments = await Comment.find({ postId });
+
+		// Restituisci i commenti del post specifico come risposta
+		res.json(comments);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+});
+
+// Endpoint per ottenere un commento specifico di un post specifico
+router.get("/blogposts/:id/comments/:commentid", (req, res) => {
+	const postId = req.params.id;
+	const commentId = req.params.commentid;
+	// Qui puoi recuperare il commento specifico dal tuo database
+	// e restituirlo come risposta JSON
+	res.json({
+		message: `Ottenendo il commento con ID: ${commentId} del post con ID: ${postId}`,
+	});
+});
+
+// Endpoint per aggiungere un nuovo commento ad un post specifico
+router.post("/blogposts/:id/comments", async (req, res) => {
+	const postId = req.params.id;
+	const { text } = req.body;
+
+	try {
+		// Trova il post dal database utilizzando l'ID del post
+		const post = await BlogPost.findById(postId);
+
+		if (!post) {
+			// Se il post non è stato trovato, restituisci un errore 404 (Not Found)
+			return res.status(404).json({ error: "Post non trovato" });
+		}
+
+		// Assicurati che l'array dei commenti esista nel post
+		if (!post.comments) {
+			post.comments = [];
+		}
+
+		// Aggiungi il nuovo commento all'array 'comments' del post
+		post.comments.push({ text });
+
+		// Salva il post aggiornato nel tuo database
+		await post.save();
+
+		// Restituisci il commento appena creato come risposta
+		res.status(201).json({
+			message: "Nuovo commento aggiunto con successo",
+			comment: post.comments[post.comments.length - 1],
+		});
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+});
+
+// Endpoint per modificare un commento specifico di un post specifico
+router.put("/blogposts/:id/comments/:commentid", async (req, res) => {
+	const postId = req.params.id;
+	const commentId = req.params.commentid;
+	const updatedCommentData = req.body; // I nuovi dati del commento inviati nel corpo della richiesta
+
+	try {
+		// Cerca il commento nel tuo database in base all'ID del post e all'ID del commento
+		const existingComment = await Comment.findOne({
+			_id: commentId,
+			postId: postId,
+		});
+
+		if (!existingComment) {
+			return res.status(404).json({ message: "Commento non trovato" });
+		}
+
+		// Aggiorna i dati del commento esistente con i nuovi dati
+		existingComment.text = updatedCommentData.text;
+		// Puoi aggiornare altri campi del commento secondo le tue necessità
+
+		// Salva il commento aggiornato nel tuo database
+		const updatedComment = await existingComment.save();
+
+		// Restituisci il commento aggiornato come risposta
+		res.json({ message: "Commento aggiornato con successo", updatedComment });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+});
+
+// Endpoint per eliminare un commento specifico da un post specifico
+router.delete("/blogposts/:id/comments/:commentid", (req, res) => {
+	const postId = req.params.id;
+	const commentId = req.params.commentid;
+	// Qui puoi eliminare il commento specifico dal tuo database
+	res.json({
+		message: `Commento con ID: ${commentId} del post con ID: ${postId} eliminato`,
+	});
 });
 
 module.exports = router;

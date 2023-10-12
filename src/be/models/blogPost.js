@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+// Definisci lo schema per i commenti
+const commentSchema = new Schema({
+	text: { type: String, required: true },
+});
+
 // Definisci lo schema del blog post
 const blogPostSchema = new Schema({
 	category: {
@@ -35,6 +40,7 @@ const blogPostSchema = new Schema({
 		type: String,
 		required: true,
 	},
+	comments: [commentSchema], // Array di commenti basati sullo schema dei commenti
 });
 
 // Crea un modello basato sullo schema del blog post
