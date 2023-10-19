@@ -12,7 +12,7 @@ const port = 5050;
 // Middleware per il parsing del corpo della richiesta in JSON
 server.use(express.json());
 
-server.use("/public", express.static(path.join(__dirname, "../public")));
+server.use("/public", express.static(path.join(__dirname, "./public")));
 
 // Middleware di CORS per consentire le richieste dal frontend
 server.use(cors());

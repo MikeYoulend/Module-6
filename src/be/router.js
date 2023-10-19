@@ -5,6 +5,24 @@ const BlogPost = require("./models/blogPost");
 const multer = require("multer");
 const crypto = require("crypto");
 const path = require("path");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
+require("dotenv").config();
+
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const cloudStorage = new CloudinaryStorage({
+	cloudinary: cloudinary,
+	params: {
+		folder: "Cloudinary",
+		format: async (req, file) => "png",
+		public_id: (req, file) => file.name,
+	},
+});
 
 const internalStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
@@ -18,13 +36,27 @@ const internalStorage = multer.diskStorage({
 });
 
 const upload = multer({ storage: internalStorage });
+const cloudUpload = multer({ storage: cloudStorage });
+
+router.post(
+	"/posts/cloudUpload",
+	cloudUpload.single("cover"),
+	async (req, res) => {
+		try {
+			res.status(200).json({ cover: req.file.path });
+		} catch (e) {
+			console.error("Errore durante l'upload del file:", e);
+			res.status(500).json({ error: "Errore durante l'upload del file" });
+		}
+	}
+);
 
 router.post("/posts/upload", upload.single("cover"), async (req, res) => {
 	const url = `${req.protocol}://${req.get("host")}`;
 
 	try {
 		const imgUrl = req.file.filename;
-		res.status(200).json({ img: `${url}/public/${imgUrl}` });
+		res.status(200).json({ cover: `${url}/public/${imgUrl}` });
 	} catch (error) {
 		console.error("Errore durante l'upload del file:", error);
 		res.status(500).json({ error: "Errore durante l'upload del file" });
@@ -240,14 +272,11 @@ router.put("/blogposts/:id", async (req, res) => {
 // DELETE: Cancella un blog post per ID
 router.delete("/blogposts/:id", async (req, res) => {
 	try {
-		const blogPostId = req.params.id;
-		const deletedBlogPost = await BlogPost.findByIdAndDelete(blogPostId);
-		if (!deletedBlogPost) {
-			return res.status(404).json({ message: "Blog post non trovato" });
-		}
-		res.json({ message: "Blog post eliminato con successo" });
+		const { id } = req.params;
+		await BlogPost.findByIdAndDelete(id);
+		res.status(200).json({ message: "Post eliminato con successo" });
 	} catch (error) {
-		res.status(500).json({ error: error.message });
+		res.status(500).json({ error: "Errore durante l'eliminazione del post" });
 	}
 });
 
