@@ -1,5 +1,5 @@
-### Richiesta GET per ottenere la lista degli autori
-GET http://localhost:5050/authors
+### Richiesta GET per ottenere la lista degli users
+GET http://localhost:5050/user
 
 ### Richiesta GET per ottenere un singolo autore per ID
 GET http://localhost:5050/authors/1
@@ -20,4 +20,27 @@ GET http://localhost:5050/blogposts?title=artificiale
 GET http://localhost:5050/blogposts/65201821655e04b71200a01/John_Doe
 
 ###
+
+POST http://localhost:5050/users/create HTTP/1.1
+Content-Type: application/json
+
+{
+    "firstname": "Michele",
+    "lastname": "Lo Presti",
+    "email": "mikeyoulend@gmail.com",
+    "password": "d735pa"
+}
+
+###
+
+
+POST   http://localhost:5050/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "mikeyoulend@gmail.com",
+    "password": "d735pa"
+}
+
+
 

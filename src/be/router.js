@@ -8,6 +8,8 @@ const path = require("path");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
+const bcrypt = require("bcrypt");
+const User = require("./models/users");
 
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -63,113 +65,79 @@ router.post("/posts/upload", upload.single("cover"), async (req, res) => {
 	}
 });
 
-router.get("/authors/:id", async (req, res) => {
+router.get("/users/:id", async (req, res) => {
 	try {
-		// Ottieni l'ID dell'autore dalla richiesta
-		const authorId = req.params.id;
-
-		// Interroga il database per trovare l'autore con l'ID specificato
-		const author = await Author.findById(authorId);
-
-		// Se l'autore non è stato trovato, restituisci uno stato 404 Not Found
-		if (!author) {
-			return res.status(404).json({ message: "Autore non trovato" });
+		const userId = req.params.id;
+		const user = await User.findById(userId);
+		if (!user) {
+			return res.status(404).json({ message: "Utente non trovato" });
 		}
-
-		// Se l'autore è stato trovato, invia l'autore come risposta
-		res.json(author);
+		res.json(user);
 	} catch (error) {
-		// Gestisci gli errori
 		res.status(500).json({ error: error.message });
 	}
 });
 
-router.get("/authors", async (req, res) => {
+// Ottieni tutti gli utenti
+router.get("/users", async (req, res) => {
 	try {
-		// Interroga il database per ottenere tutti gli autori
-		const authors = await Author.find();
-
-		// Invia la lista degli autori come risposta
-		res.json(authors);
+		const users = await User.find();
+		res.json(users);
 	} catch (error) {
-		// Gestisci gli errori
 		res.status(500).json({ error: error.message });
 	}
 });
 
-router.post("/authors", async (req, res) => {
+// Crea un nuovo utente
+router.post("/users/create", async (req, res) => {
+	const salt = await bcrypt.genSalt(10);
+	const hashedPassword = await bcrypt.hash(req.body.password, salt);
 	try {
-		// Crea un nuovo autore utilizzando i dati dalla richiesta
-		const newAuthor = new Author({
-			nome: req.body.nome,
-			cognome: req.body.cognome,
+		const newUser = new User({
+			firstname: req.body.firstname,
+			lastname: req.body.lastname,
 			email: req.body.email,
-			dataDiNascita: req.body.dataDiNascita,
+			password: hashedPassword,
 			avatar: req.body.avatar,
 		});
-
-		// Salva l'autore nel database
-		const savedAuthor = await newAuthor.save();
-
-		// Invia l'autore salvato come risposta
-		res.json(savedAuthor);
+		const savedUser = await newUser.save();
+		res.json(savedUser);
 	} catch (error) {
-		// Gestisci gli errori, inviando una risposta con lo stato 500 (Internal Server Error)
 		res.status(500).json({ error: error.message });
 	}
 });
 
-router.put("/authors/:id", async (req, res) => {
+// Aggiorna un utente per ID
+router.put("/users/:id", async (req, res) => {
 	try {
-		// Ottieni l'ID dell'autore dalla richiesta
-		const authorId = req.params.id;
-
-		// Interroga il database per trovare l'autore con l'ID specificato
-		const author = await Author.findById(authorId);
-
-		// Se l'autore non è stato trovato, restituisci uno stato 404 Not Found
-		if (!author) {
-			return res.status(404).json({ message: "Autore non trovato" });
+		const userId = req.params.id;
+		const user = await User.findById(userId);
+		if (!user) {
+			return res.status(404).json({ message: "Utente non trovato" });
 		}
-
-		// Aggiorna i dati dell'autore con i nuovi dati dalla richiesta
-		author.nome = req.body.nome;
-		author.cognome = req.body.cognome;
-		author.email = req.body.email;
-		author.dataDiNascita = req.body.dataDiNascita;
-		author.avatar = req.body.avatar;
-
-		// Salva l'autore aggiornato nel database
-		const updatedAuthor = await author.save();
-
-		// Invia l'autore aggiornato come risposta
-		res.json(updatedAuthor);
+		user.firstname = req.body.firstname;
+		user.lastname = req.body.lastname;
+		user.email = req.body.email;
+		user.password = req.body.password;
+		user.avatar = req.body.avatar;
+		const updatedUser = await user.save();
+		res.json(updatedUser);
 	} catch (error) {
-		// Gestisci gli errori
 		res.status(500).json({ error: error.message });
 	}
 });
 
-router.delete("/authors/:id", async (req, res) => {
+// Elimina un utente per ID
+router.delete("/users/:id", async (req, res) => {
 	try {
-		// Ottieni l'ID dell'autore dalla richiesta
-		const authorId = req.params.id;
-
-		// Interroga il database per trovare l'autore con l'ID specificato
-		const author = await Author.findById(authorId);
-
-		// Se l'autore non è stato trovato, restituisci uno stato 404 Not Found
-		if (!author) {
-			return res.status(404).json({ message: "Autore non trovato" });
+		const userId = req.params.id;
+		const user = await User.findById(userId);
+		if (!user) {
+			return res.status(404).json({ message: "Utente non trovato" });
 		}
-
-		// Elimina l'autore dal database
-		await author.remove();
-
-		// Invia una risposta vuota per indicare che l'autore è stato eliminato con successo
-		res.json({ message: "Autore eliminato con successo" });
+		await user.remove();
+		res.json({ message: "Utente eliminato con successo" });
 	} catch (error) {
-		// Gestisci gli errori
 		res.status(500).json({ error: error.message });
 	}
 });

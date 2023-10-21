@@ -62,20 +62,32 @@ const BlogPost = () => {
 
 	const handleSearch = (e) => {
 		const query = e.target.value.toLowerCase();
-		const filteredPosts = allPosts.filter((post) => {
+		if (!query) {
+			// Se la query è vuota, rifetcha tutti i post
+			fetch("http://localhost:5050/blogposts")
+				.then((response) => response.json())
+				.then((data) => {
+					// Aggiorna lo stato locale con tutti i post ottenuti dalla fetch
+					setPostsState(data);
+				})
+				.catch((error) => {
+					console.error("Errore durante il recupero dei post:", error);
+				});
+			return;
+		}
+
+		const filteredPosts = posts.filter((post) => {
 			const titleMatch = post.title.toLowerCase().includes(query);
 			const authorMatch = post.author.name.toLowerCase().includes(query);
-			const categoryMatch = post.category.toLowerCase().includes(query);
 
-			// Restituisci true se il titolo, l'autore o la categoria corrispondono alla query
-			return titleMatch || authorMatch || categoryMatch;
+			// Restituisci true se almeno una delle condizioni è soddisfatta
+			return titleMatch || authorMatch;
 		});
 
-		// I dati filtrati vengono inviati a Redux usando l'azione setFilteredPosts
-
-		// Aggiorna lo stato locale per visualizzare i risultati filtrati
+		// Aggiorna lo stato locale con i post filtrati
 		setPostsState(filteredPosts);
 	};
+
 	if (loading) {
 		// Se i dati stanno ancora caricando, mostra un messaggio di caricamento
 		return (
@@ -92,7 +104,7 @@ const BlogPost = () => {
 				<input
 					className="input-search"
 					type="text"
-					placeholder="Cerca per titolo, autore o categoria..."
+					placeholder="Cerca per titolo o autore.."
 					onChange={handleSearch}
 				/>
 			</div>

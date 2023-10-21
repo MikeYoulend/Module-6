@@ -13,11 +13,10 @@ const HomePage = () => {
 						<Nav.Link className="fs-1 " as={Link} to="/admin">
 							AdminPage
 						</Nav.Link>
-						{/* Aggiungi altri link per le tue pagine qui */}
 					</Nav>
 				</Navbar.Collapse>
 			</Navbar>
-
+			;
 			<h1 className="text-center display-2 fw-bold text-white">
 				I Nostri Ultimi Contenuti
 			</h1>

@@ -12,7 +12,7 @@ const AdminPage = () => {
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="ml-auto">
-						<Nav.Link className="ms-2 fs-1 " as={Link} to="/">
+						<Nav.Link className="ms-2 fs-1 " as={Link} to="/home">
 							Home
 						</Nav.Link>
 						{/* Aggiungi altri link per le tue pagine qui */}
