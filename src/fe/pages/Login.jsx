@@ -31,7 +31,7 @@ const Login = () => {
 
 			if (data.token) {
 				localStorage.setItem("loggedInUser", JSON.stringify(data.token));
-				navigate("/home");
+				navigate(`/home/${encodeURIComponent(data.token)}`);
 			}
 
 			setLogin(data);
@@ -40,13 +40,15 @@ const Login = () => {
 		}
 	};
 
+	const redirectForLoginWithGithub = () => {
+		window.location.href = "http://localhost:5050/auth/github";
+	};
+
 	return (
 		<div className="container mt-5">
 			<div className="row justify-content-center">
 				<div className="col-md-6">
 					<div className="card bg-dark text-white">
-						{" "}
-						{/* Aggiungi la classe bg-dark per lo sfondo nero */}
 						<div className="card-body">
 							<h2 className="text-center mb-4">Login</h2>
 							<form onSubmit={onSubmit}>
@@ -74,6 +76,9 @@ const Login = () => {
 									Login
 								</button>
 							</form>
+							<button onClick={() => redirectForLoginWithGithub()}>
+								Login with Github
+							</button>
 						</div>
 					</div>
 				</div>

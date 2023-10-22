@@ -1,4 +1,4 @@
-import { useNavigat, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import jwtDecode from "jwt-decode";
 import Login from "../pages/Login";
 import { useEffect } from "react";

@@ -1,8 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Navbar, Nav } from "react-bootstrap";
 import BlogPost from "../components/blogpost/BlogPost";
+import { useEffect } from "react";
 
 const HomePage = () => {
+	const { token } = useParams();
+	console.log(token);
+	useEffect(() => {
+		if (token) {
+			console.log("Token:", token);
+			localStorage.setItem("token", token);
+		}
+	}, [token]);
+
 	return (
 		<div className="bg-dark">
 			<Navbar bg="dark" variant="dark" expand="lg">

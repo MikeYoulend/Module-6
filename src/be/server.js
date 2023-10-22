@@ -5,6 +5,7 @@ const authorsRouter = require("./router");
 const blogPostRouter = require("./router");
 const commentRouter = require("./router"); // Importa il router dei commenti
 const loginRoute = require("./routes/login");
+const githubRoute = require("./routes/github");
 const cors = require("cors");
 const path = require("path");
 
@@ -25,6 +26,7 @@ server.use("/", blogPostRouter);
 server.use("/", commentRouter); // Tutte le richieste a /comments saranno gestite da commentRouter
 server.use("/", usersRouter);
 server.use("/", loginRoute);
+server.use("/", githubRoute);
 
 mongoose.connect(
 	"mongodb+srv://mikeyoulend:dzgJb5KNuUbjwf1a@epiccluster.udtebk2.mongodb.net/",
