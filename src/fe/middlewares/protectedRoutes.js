@@ -8,7 +8,9 @@ const isAuth = () => {
 };
 
 export const useSession = () => {
-	const session = isAuth();
+	const localToken = localStorage.getItem("loggedInUser");
+	const githubToken = localStorage.getItem("githubToken");
+	const session = localToken || githubToken;
 	const decodedSession = session ? jwtDecode(session) : null;
 	const navigate = useNavigate();
 

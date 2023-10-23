@@ -4,15 +4,19 @@ import BlogPost from "../components/blogpost/BlogPost";
 import { useEffect } from "react";
 
 const HomePage = () => {
-	const { token } = useParams();
+	const { token, githubToken } = useParams(); // Aggiungi "githubToken" ai parametri
 	console.log(token);
+
 	useEffect(() => {
 		if (token) {
 			console.log("Token:", token);
-			localStorage.setItem("token", token);
+			localStorage.setItem("token", token); // Memorizza il token normale
 		}
-	}, [token]);
-
+		if (githubToken) {
+			console.log("GitHub Token:", githubToken);
+			localStorage.setItem("githubToken", githubToken); // Memorizza il token di GitHub
+		}
+	}, [token, githubToken]);
 	return (
 		<div className="bg-dark">
 			<Navbar bg="dark" variant="dark" expand="lg">
