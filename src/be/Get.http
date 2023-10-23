@@ -1,8 +1,7 @@
 ### Richiesta GET per ottenere la lista degli users
-GET http://localhost:5050/user
+GET http://localhost:5050/users
 
-### Richiesta GET per ottenere un singolo autore per ID
-GET http://localhost:5050/authors/1
+
 
 ### Richiest GET per ottenere i BlogPost
 GET http://localhost:5050/blogposts

@@ -146,6 +146,25 @@ router.delete("/users/:id", async (req, res) => {
 //BLOGPOST
 //
 
+router.get("/blogposts/:id/comments", async (req, res) => {
+	const postId = req.params.id;
+
+	try {
+		// Cerca i commenti in base all'ID del post
+		const post = await BlogPost.findById(postId);
+
+		if (!post) {
+			// Se il post non è stato trovato, restituisci un errore 404 (Not Found)
+			return res.status(404).json({ error: "Post non trovato" });
+		}
+
+		// Restituisci i commenti del post specifico come risposta
+		res.json(post.comments);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+});
+
 router.get("/blogposts/:id/:authorName", async (req, res) => {
 	const authorId = req.params.id;
 	const authorName = req.params.authorName.replace("_", " "); // Sostituisci "_" con uno spazio nel nome dell'autore
@@ -252,20 +271,6 @@ router.delete("/blogposts/:id", async (req, res) => {
 //Comments
 //
 
-router.get("/blogposts/:id/comments", async (req, res) => {
-	try {
-		const postId = req.params.id;
-
-		// Cerca i commenti in base all'ID del post
-		const comments = await Comment.find({ postId });
-
-		// Restituisci i commenti del post specifico come risposta
-		res.json(comments);
-	} catch (error) {
-		res.status(500).json({ error: error.message });
-	}
-});
-
 // Endpoint per ottenere un commento specifico di un post specifico
 router.get("/blogposts/:id/comments/:commentid", (req, res) => {
 	const postId = req.params.id;
@@ -344,13 +349,43 @@ router.put("/blogposts/:id/comments/:commentid", async (req, res) => {
 });
 
 // Endpoint per eliminare un commento specifico da un post specifico
-router.delete("/blogposts/:id/comments/:commentid", (req, res) => {
+router.delete("/blogposts/:id/comments/:commentid", async (req, res) => {
 	const postId = req.params.id;
 	const commentId = req.params.commentid;
-	// Qui puoi eliminare il commento specifico dal tuo database
-	res.json({
-		message: `Commento con ID: ${commentId} del post con ID: ${postId} eliminato`,
-	});
+
+	try {
+		// Trova il post dal database utilizzando l'ID del post
+		const post = await BlogPost.findById(postId);
+
+		// Verifica se il post è stato trovato
+		if (!post) {
+			return res.status(404).json({ error: "Post non trovato" });
+		}
+
+		// Trova l'indice del commento nell'array dei commenti del post
+		const commentIndex = post.comments.findIndex(
+			(comment) => comment._id == commentId
+		);
+
+		// Verifica se il commento è stato trovato
+		if (commentIndex === -1) {
+			return res.status(404).json({ error: "Commento non trovato" });
+		}
+
+		// Rimuovi il commento dall'array dei commenti
+		post.comments.splice(commentIndex, 1);
+
+		// Salva il post aggiornato nel tuo database
+		await post.save();
+
+		// Restituisci i commenti aggiornati come risposta
+		res.status(200).json({
+			message: `Commento con ID: ${commentId} eliminato dal post con ID: ${postId}`,
+			comments: post.comments,
+		});
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
 });
 
 module.exports = router;

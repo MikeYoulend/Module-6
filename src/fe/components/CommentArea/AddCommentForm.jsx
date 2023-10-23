@@ -12,14 +12,19 @@ const AddCommentForm = ({ postId, onCommentSubmit }) => {
 	};
 
 	return (
-		<form onSubmit={handleSubmit}>
-			<input
-				type="text"
-				placeholder="Inserisci il tuo commento..."
-				value={commentText}
-				onChange={(e) => setCommentText(e.target.value)}
-			/>
-			<button type="submit">Invia Commento</button>
+		<form className="mt-3" onSubmit={handleSubmit}>
+			<div className="input-group mb-3">
+				<input
+					type="text"
+					className="form-control"
+					placeholder="Inserisci il tuo commento..."
+					value={commentText}
+					onChange={(e) => setCommentText(e.target.value)}
+				/>
+				<button className="btn btn-primary" type="submit">
+					Invia Commento
+				</button>
+			</div>
 		</form>
 	);
 };

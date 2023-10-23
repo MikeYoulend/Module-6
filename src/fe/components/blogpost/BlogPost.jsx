@@ -3,11 +3,13 @@ import { Col, Row, Spinner } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import "../../../App.css";
 import AddCommentForm from "../CommentArea/AddCommentForm";
+import CommentList from "../CommentArea/CommentList";
 
 const BlogPost = () => {
 	const allPosts = useSelector((state) => state.posts);
 	const [loading, setLoading] = useState(true);
 	const [posts, setPostsState] = useState(allPosts);
+	const [currentPostId, setCurrentPostId] = useState(null);
 
 	const handleCommentSubmit = (postId, text) => {
 		console.log("ID del post:", postId);
@@ -128,6 +130,7 @@ const BlogPost = () => {
 								postId={post._id}
 								onCommentSubmit={handleCommentSubmit}
 							/>
+							<CommentList postId={post._id} />
 						</div>
 					</Col>
 				))}
