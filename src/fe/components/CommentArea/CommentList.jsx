@@ -35,8 +35,8 @@ const CommentList = ({ postId }) => {
 
 	return (
 		<div
-			className="comment-list mt-4 p-4"
-			style={{ backgroundColor: "#f8f9fa", borderRadius: "10px" }}
+			className="comment-list mt-5  p-4"
+			style={{ backgroundColor: "#f8f1fa", borderRadius: "10px" }}
 		>
 			<h3 className="mb-3 bg-dark text-white p-2 rounded">Commenti</h3>
 			{comments.length > 0 ? (

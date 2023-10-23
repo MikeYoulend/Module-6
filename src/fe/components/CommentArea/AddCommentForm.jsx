@@ -12,7 +12,7 @@ const AddCommentForm = ({ postId, onCommentSubmit }) => {
 	};
 
 	return (
-		<form className="mt-3" onSubmit={handleSubmit}>
+		<form className="mt-5 pt-5" onSubmit={handleSubmit}>
 			<div className="input-group mb-3">
 				<input
 					type="text"

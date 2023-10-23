@@ -238,21 +238,25 @@ router.post("/blogposts", async (req, res) => {
 // PUT: Modifica un blog post per ID
 router.put("/blogposts/:id", async (req, res) => {
 	try {
-		const blogPostId = req.params.id;
-		const updatedBlogPost = await BlogPost.findByIdAndUpdate(
-			blogPostId,
-			req.body,
-			{
-				new: true,
-				runValidators: true,
-			}
+		const { id } = req.params;
+		const { title, category, content } = req.body;
+
+		const updatedPost = await BlogPost.findByIdAndUpdate(
+			id,
+			{ title, category, content },
+			{ new: true }
 		);
-		if (!updatedBlogPost) {
-			return res.status(404).json({ message: "Blog post non trovato" });
+
+		if (!updatedPost) {
+			return res.status(404).json({ message: "Post non trovato." });
 		}
-		res.json(updatedBlogPost);
+
+		res
+			.status(200)
+			.json({ message: "Post aggiornato con successo", post: updatedPost });
 	} catch (error) {
-		res.status(500).json({ error: error.message });
+		console.error("Errore durante l'aggiornamento del post:", error);
+		res.status(500).json({ error: "Errore durante l'aggiornamento del post" });
 	}
 });
 
@@ -324,25 +328,36 @@ router.put("/blogposts/:id/comments/:commentid", async (req, res) => {
 	const updatedCommentData = req.body; // I nuovi dati del commento inviati nel corpo della richiesta
 
 	try {
-		// Cerca il commento nel tuo database in base all'ID del post e all'ID del commento
-		const existingComment = await Comment.findOne({
-			_id: commentId,
-			postId: postId,
-		});
+		// Trova il post dal database utilizzando l'ID del post
+		const post = await BlogPost.findById(postId);
 
-		if (!existingComment) {
-			return res.status(404).json({ message: "Commento non trovato" });
+		// Verifica se il post è stato trovato
+		if (!post) {
+			return res.status(404).json({ error: "Post non trovato" });
+		}
+
+		// Trova l'indice del commento nell'array dei commenti del post
+		const commentIndex = post.comments.findIndex(
+			(comment) => comment._id == commentId
+		);
+
+		// Verifica se il commento è stato trovato
+		if (commentIndex === -1) {
+			return res.status(404).json({ error: "Commento non trovato" });
 		}
 
 		// Aggiorna i dati del commento esistente con i nuovi dati
-		existingComment.text = updatedCommentData.text;
+		post.comments[commentIndex].text = updatedCommentData.text;
 		// Puoi aggiornare altri campi del commento secondo le tue necessità
 
-		// Salva il commento aggiornato nel tuo database
-		const updatedComment = await existingComment.save();
+		// Salva il post aggiornato nel tuo database
+		await post.save();
 
 		// Restituisci il commento aggiornato come risposta
-		res.json({ message: "Commento aggiornato con successo", updatedComment });
+		res.status(200).json({
+			message: `Commento con ID: ${commentId} nel post con ID: ${postId} aggiornato con successo`,
+			comment: post.comments[commentIndex],
+		});
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
