@@ -77,7 +77,7 @@ const Login = () => {
 								</button>
 							</form>
 							<button
-								className="btn btn-primary mt-3" // Classi di Bootstrap per il colore del pulsante e il margine superiore
+								className="btn btn-primary mt-3"
 								onClick={() => redirectForLoginWithGithub()}
 							>
 								Login with Github
