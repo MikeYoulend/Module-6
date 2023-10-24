@@ -1,3 +1,6 @@
+DEPLOY LIVE: https://main--jocular-longma-201c45.netlify.app/
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
